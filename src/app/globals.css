@@ -134,6 +134,34 @@ h1 {
   gap: 10px;
 }
 
+.language-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.language-selector label {
+  white-space: nowrap;
+}
+
+.language-selector select {
+  min-height: 30px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 8px;
+  background: #ffffff;
+  color: var(--ink);
+  outline: none;
+}
+
 .engine-health {
   display: flex;
   flex-wrap: wrap;

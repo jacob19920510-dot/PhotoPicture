@@ -13,6 +13,8 @@ import {
   UploadCloud
 } from "lucide-react";
 import clsx from "clsx";
+import { languageOptions, resolveStoredOrBrowserLanguage, setStoredLanguage, translations } from "@/lib/i18n";
+import type { LanguageId } from "@/lib/i18n";
 import type {
   DenoiseLevel,
   EngineId,
@@ -32,29 +34,22 @@ interface EngineStatus {
 
 type ThemeId = "blue" | "violet" | "rose" | "amber" | "green";
 
-const themeOptions: Array<{ value: ThemeId; label: string }> = [
-  { value: "blue", label: "蓝色" },
-  { value: "violet", label: "紫色" },
-  { value: "rose", label: "玫瑰" },
-  { value: "amber", label: "金色" },
-  { value: "green", label: "绿色" }
+const engineOptions: Array<{ value: EngineId; label: keyof (typeof translations)["en"] }> = [
+  { value: "faithful", label: "faithfulEngine" },
+  { value: "realesrgan", label: "realesrganEngine" },
+  { value: "waifu2x", label: "waifu2xEngine" }
 ];
 
-const engineLabels: Record<EngineId, string> = {
-  faithful: "保真高清",
-  realesrgan: "Real-ESRGAN",
-  waifu2x: "Waifu2x"
-};
-
-const denoiseOptions: Array<{ value: DenoiseLevel; label: string }> = [
-  { value: "off", label: "关闭" },
-  { value: "low", label: "轻度" },
-  { value: "medium", label: "中度" },
-  { value: "high", label: "强" }
+const denoiseOptions: Array<{ value: DenoiseLevel; label: keyof (typeof translations)["en"] }> = [
+  { value: "off", label: "denoiseOff" },
+  { value: "low", label: "denoiseLow" },
+  { value: "medium", label: "denoiseMedium" },
+  { value: "high", label: "denoiseHigh" }
 ];
 
 export default function Home() {
   const [theme, setTheme] = useState<ThemeId>("blue");
+  const [language, setLanguage] = useState<LanguageId>("zh-CN");
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [settings, setSettings] = useState<JobSettings>({
@@ -69,6 +64,15 @@ export default function Home() {
   const [engines, setEngines] = useState<EngineStatus[]>([]);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  const text = translations[language];
+  const themeOptions: Array<{ value: ThemeId; label: string }> = [
+    { value: "blue", label: text.themeBlue },
+    { value: "violet", label: text.themeViolet },
+    { value: "rose", label: text.themeRose },
+    { value: "amber", label: text.themeAmber },
+    { value: "green", label: text.themeGreen }
+  ];
+
   const selectedEngine = engines.find((engine) => engine.id === settings.engine);
   const canSubmit = Boolean(file) && job?.status !== "queued" && job?.status !== "running";
   const isBusy = job?.status === "queued" || job?.status === "running";
@@ -82,6 +86,15 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem("photo-picture-theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    setLanguage(resolveStoredOrBrowserLanguage());
+  }, []);
+
+  useEffect(() => {
+    setStoredLanguage(language);
+    document.documentElement.lang = language === "en" ? "en" : language;
+  }, [language]);
 
   useEffect(() => {
     fetch("/api/engines")
@@ -100,13 +113,13 @@ export default function Home() {
       if (response.ok) {
         setJob(data.job);
       } else {
-        setError(data.error ?? "任务状态读取失败。");
+        setError(data.error ?? text.pollingError);
         setJob(null);
       }
     }, 900);
 
     return () => clearInterval(timer);
-  }, [job]);
+  }, [job, text.pollingError]);
 
   useEffect(() => {
     return () => {
@@ -115,9 +128,9 @@ export default function Home() {
   }, [previewUrl]);
 
   const inputSummary = useMemo(() => {
-    if (!file) return "支持 PNG、JPG、WebP，单张不超过 80MB。";
+    if (!file) return text.defaultInputSummary;
     return `${file.name} · ${formatBytes(file.size)}`;
-  }, [file]);
+  }, [file, text.defaultInputSummary]);
 
   function pickFile(nextFile: File | null) {
     setError(null);
@@ -126,7 +139,7 @@ export default function Home() {
     if (!nextFile) return;
 
     if (!["image/png", "image/jpeg", "image/webp"].includes(nextFile.type)) {
-      setError("目前支持 PNG、JPG 和 WebP 图片。");
+      setError(text.fileTypeError);
       return;
     }
 
@@ -155,12 +168,12 @@ export default function Home() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error ?? "创建任务失败。");
+        throw new Error(data.error ?? text.submitError);
       }
 
       setJob(data.job);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "创建任务失败。");
+      setError(caught instanceof Error ? caught.message : text.submitError);
     }
   }
 
@@ -176,30 +189,44 @@ export default function Home() {
 
   return (
     <main className="shell" data-theme={theme}>
-      <section className="workspace" aria-label="图片高清化工具">
+      <section className="workspace" aria-label={text.workspaceLabel}>
         <header className="topbar">
           <div>
             <div className="eyebrow">
               <Sparkles size={16} />
-              本地高清化
+              {text.eyebrow}
             </div>
-            <h1>图片放大与降噪</h1>
+            <h1>{text.heading}</h1>
           </div>
           <div className="topbar-tools">
-            <div className="theme-switcher" aria-label="主色调">
+            <div className="language-selector">
+              <label htmlFor="language-select">Language</label>
+              <select
+                id="language-select"
+                value={language}
+                onChange={(event) => setLanguage(event.target.value as LanguageId)}
+              >
+                {languageOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="theme-switcher" aria-label={text.accentColorLabel}>
               <Palette size={16} />
               {themeOptions.map((option) => (
                 <button
                   key={option.value}
                   type="button"
                   className={clsx("theme-dot", option.value, theme === option.value && "active")}
-                  aria-label={`切换为${option.label}主色调`}
+                  aria-label={`${text.accentColorLabel}: ${option.label}`}
                   title={option.label}
                   onClick={() => setTheme(option.value)}
                 />
               ))}
             </div>
-            <div className="engine-health" aria-label="引擎安装状态">
+            <div className="engine-health" aria-label={text.engineHealthLabel}>
               {engines.map((engine) => (
                 <span
                   key={engine.id}
@@ -228,7 +255,7 @@ export default function Home() {
               onDrop={handleDrop}
             >
               <UploadCloud size={32} />
-              <span>拖入图片或点击选择</span>
+              <span>{text.dropTitle}</span>
               <small>{inputSummary}</small>
             </button>
             <input
@@ -240,23 +267,23 @@ export default function Home() {
             />
 
             <div className="field">
-              <label>处理引擎</label>
+              <label>{text.engineLabel}</label>
               <div className="segmented three">
-                {(["faithful", "realesrgan", "waifu2x"] as EngineId[]).map((engine) => (
+                {engineOptions.map((engine) => (
                   <button
-                    key={engine}
+                    key={engine.value}
                     type="button"
-                    className={settings.engine === engine ? "active" : undefined}
-                    onClick={() => setSettings((current) => ({ ...current, engine }))}
+                    className={settings.engine === engine.value ? "active" : undefined}
+                    onClick={() => setSettings((current) => ({ ...current, engine: engine.value }))}
                   >
-                    {engineLabels[engine]}
+                    {text[engine.label]}
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="field">
-              <label>放大倍率</label>
+              <label>{text.scaleLabel}</label>
               <div className="segmented three">
                 {([2, 3, 4] as ScaleFactor[]).map((scale) => (
                   <button
@@ -272,7 +299,7 @@ export default function Home() {
             </div>
 
             <div className="field">
-              <label>降噪</label>
+              <label>{text.denoiseLabel}</label>
               <div className="segmented four">
                 {denoiseOptions.map((option) => (
                   <button
@@ -283,14 +310,14 @@ export default function Home() {
                       setSettings((current) => ({ ...current, denoise: option.value }))
                     }
                   >
-                    {option.label}
+                    {text[option.label]}
                   </button>
                 ))}
               </div>
             </div>
 
             <div className="field">
-              <label>输出格式</label>
+              <label>{text.outputFormatLabel}</label>
               <select
                 value={settings.outputFormat}
                 onChange={(event) =>
@@ -300,7 +327,7 @@ export default function Home() {
                   }))
                 }
               >
-                <option value="preserve">保留原格式</option>
+                <option value="preserve">{text.outputPreserve}</option>
                 <option value="png">PNG</option>
                 <option value="jpg">JPG</option>
               </select>
@@ -309,14 +336,14 @@ export default function Home() {
             {selectedEngine && !selectedEngine.installed ? (
               <div className="notice warning">
                 <AlertCircle size={18} />
-                <span>当前引擎未安装。重新运行开发服务会自动下载，或运行 npm run engines:install。</span>
+                <span>{text.engineMissing}</span>
               </div>
             ) : null}
 
             {settings.engine !== "faithful" ? (
               <div className="notice warning">
                 <AlertCircle size={18} />
-                <span>AI 引擎可能重绘细节。带文字、表格、海报时建议用保真高清。</span>
+                <span>{text.aiEngineWarning}</span>
               </div>
             ) : null}
 
@@ -327,17 +354,17 @@ export default function Home() {
               </div>
             ) : null}
 
-            {job ? <ProgressPanel job={job} /> : null}
+            {job ? <ProgressPanel job={job} text={text} /> : null}
 
             <div className="actions">
               <button className="primary-action" type="button" disabled={!canSubmit} onClick={submit}>
                 {isBusy ? <Loader2 className="spin" size={19} /> : <ImagePlus size={19} />}
-                开始处理
+                {text.startButton}
               </button>
               <button
                 className="icon-action"
                 type="button"
-                title="重新选择"
+                title={text.resetTitle}
                 onClick={() => {
                   setFile(null);
                   setJob(null);
@@ -352,15 +379,15 @@ export default function Home() {
           </aside>
 
           <section className="preview-grid">
-            <ImagePane title="原图" src={previewUrl} empty="选择图片后会显示原图预览" />
-            <ImagePane title="结果" src={resultUrl} empty="处理完成后会显示高清结果" />
+            <ImagePane title={text.originalPane} src={previewUrl} empty={text.originalEmpty} />
+            <ImagePane title={text.resultPane} src={resultUrl} empty={text.resultEmpty} />
           </section>
         </div>
 
         {resultUrl ? (
           <a className="download-bar" href={resultUrl}>
             <Download size={18} />
-            下载高清图片
+            {text.downloadLink}
           </a>
         ) : null}
       </section>
@@ -384,15 +411,21 @@ function ImagePane({ title, src, empty }: { title: string; src: string | null; e
   );
 }
 
-function ProgressPanel({ job }: { job: PublicJob }) {
+function ProgressPanel({
+  job,
+  text
+}: {
+  job: PublicJob;
+  text: (typeof translations)[LanguageId];
+}) {
   const label =
     job.status === "succeeded"
-      ? "处理完成"
+      ? text.progressSucceeded
       : job.status === "failed"
-        ? job.error ?? "处理失败"
+        ? job.error ?? text.progressFailed
         : job.status === "queued"
-          ? "任务排队中"
-          : "正在高清化";
+          ? text.progressQueued
+          : text.progressRunning;
 
   return (
     <div className={clsx("progress-panel", job.status)}>
