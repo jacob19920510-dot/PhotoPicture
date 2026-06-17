@@ -35,8 +35,36 @@ select {
 }
 
 .shell {
+  position: relative;
   min-height: 100vh;
   padding: 24px;
+  isolation: isolate;
+}
+
+.shell::before,
+.shell::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.shell::before {
+  z-index: -2;
+  background-color: var(--bg);
+  background-image: url("/bg-tile-mascot.png");
+  background-repeat: repeat;
+  background-size: 120px 94px;
+  background-position: 10px 12px;
+  opacity: 0.38;
+  filter: saturate(1.06) contrast(0.98);
+}
+
+.shell::after {
+  z-index: -1;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.64), rgba(255, 255, 255, 0.64)),
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.2), transparent 52%);
 }
 
 .shell[data-theme="violet"] {
@@ -96,6 +124,8 @@ select {
 }
 
 .workspace {
+  position: relative;
+  z-index: 1;
   width: min(1440px, 100%);
   min-height: calc(100vh - 48px);
   margin: 0 auto;
@@ -568,6 +598,11 @@ select {
     padding: 14px;
   }
 
+  .shell::before {
+    background-size: 102px 80px;
+    opacity: 0.3;
+  }
+
   .workspace {
     min-height: calc(100vh - 28px);
   }
@@ -608,6 +643,11 @@ select {
 }
 
 @media (max-width: 520px) {
+  .shell::before {
+    background-size: 88px 68px;
+    opacity: 0.24;
+  }
+
   .segmented button {
     font-size: 12px;
   }
