@@ -1,4 +1,4 @@
-export type EngineId = "faithful" | "realesrgan" | "waifu2x";
+export type EngineId = "realesrgan" | "waifu2x";
 export type ScaleFactor = 2 | 3 | 4;
 export type DenoiseLevel = "off" | "low" | "medium" | "high";
 export type OutputFormat = "preserve" | "png" | "jpg";

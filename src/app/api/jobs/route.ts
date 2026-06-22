@@ -38,7 +38,6 @@ export async function POST(request: Request) {
 }
 
 function parseEngine(value: FormDataEntryValue | null): EngineId {
-  if (value === "faithful") return "faithful";
   return value === "waifu2x" ? "waifu2x" : "realesrgan";
 }
 

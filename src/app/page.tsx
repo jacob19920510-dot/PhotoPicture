@@ -36,7 +36,6 @@ interface EngineStatus {
 type ThemeId = "blue" | "violet" | "rose" | "amber" | "green";
 
 const engineOptions: Array<{ value: EngineId; label: keyof (typeof translations)["en"] }> = [
-  { value: "faithful", label: "faithfulEngine" },
   { value: "realesrgan", label: "realesrganEngine" },
   { value: "waifu2x", label: "waifu2xEngine" }
 ];
@@ -60,7 +59,7 @@ export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [settings, setSettings] = useState<JobSettings>({
-    engine: "faithful",
+    engine: "realesrgan",
     scale: 2,
     denoise: "medium",
     realesrganModel: "realesrgan-x4plus",
@@ -277,7 +276,7 @@ export default function Home() {
 
             <div className="field">
               <label>{text.engineLabel}</label>
-              <div className="segmented three">
+              <div className="segmented two">
                 {engineOptions.map((engine) => (
                   <button
                     key={engine.value}
@@ -370,12 +369,10 @@ export default function Home() {
               </div>
             ) : null}
 
-            {settings.engine !== "faithful" ? (
-              <div className="notice warning">
-                <AlertCircle size={18} />
-                <span>{text.aiEngineWarning}</span>
-              </div>
-            ) : null}
+            <div className="notice warning">
+              <AlertCircle size={18} />
+              <span>{text.aiEngineWarning}</span>
+            </div>
 
             {error ? (
               <div className="notice error">

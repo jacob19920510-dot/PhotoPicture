@@ -6,13 +6,13 @@ const rootDir = process.cwd();
 const enginesDir = path.join(rootDir, "engines");
 
 export interface EngineConfig {
-  id: Exclude<EngineId, "faithful">;
+  id: EngineId;
   label: string;
   executable: string;
   homepage: string;
 }
 
-export const engineConfigs: Record<Exclude<EngineId, "faithful">, EngineConfig> = {
+export const engineConfigs: Record<EngineId, EngineConfig> = {
   realesrgan: {
     id: "realesrgan",
     label: "Real-ESRGAN",
@@ -36,29 +36,16 @@ export const engineConfigs: Record<Exclude<EngineId, "faithful">, EngineConfig> 
 };
 
 export function getEngineStatus() {
-  return [
-    {
-      id: "faithful" as const,
-      label: "保真高清",
-      installed: true,
-      executable: "built-in",
-      homepage: ""
-    },
-    ...Object.values(engineConfigs).map((engine) => ({
-      id: engine.id,
-      label: engine.label,
-      installed: existsSync(engine.executable),
-      executable: engine.executable,
-      homepage: engine.homepage
-    }))
-  ];
+  return Object.values(engineConfigs).map((engine) => ({
+    id: engine.id,
+    label: engine.label,
+    installed: existsSync(engine.executable),
+    executable: engine.executable,
+    homepage: engine.homepage
+  }));
 }
 
 export function getEngineCommand(settings: JobSettings, inputPath: string, outputPath: string) {
-  if (settings.engine === "faithful") {
-    throw new Error("The faithful engine is built in and does not use an external command.");
-  }
-
   const engine = engineConfigs[settings.engine];
 
   if (!existsSync(engine.executable)) {

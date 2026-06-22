@@ -1,16 +1,34 @@
 # Photo Picture Upscaler
 
-一個本地圖片高清化和放大工具。它在瀏覽器裏運行介面，但圖片處理發生在你的電腦本機，不會上傳到雲端。
+一个在本机处理图片放大与降噪的工具。界面在浏览器中运行，图片处理只在本机完成，不会上传到云端。
 
 ## 功能
 
-- 拖拽或選擇圖片上傳
-- 原圖和結果圖並排預覽
-- 支持 Real-ESRGAN 和 Waifu2x 本地引擎
-- 支持 2x、3x、4x 放大倍率
-- 支持關閉、輕度、中度、強降噪
-- 支持保留原格式、PNG、JPG 輸出
-- 自動下載 Windows Vulkan 版處理引擎
+- 支持拖拽或选择 PNG、JPG、WebP 图片。
+- 原图与结果图并排预览。
+- 支持 2×、3×、4×目标放大倍率。
+- 自动下载并使用 Windows Vulkan 版 Real-ESRGAN 与 Waifu2x 本地引擎。
+- 支持保留原格式、PNG 或 JPG 输出。
+
+应用仅提供 Real-ESRGAN 与 Waifu2x 两种处理引擎。
+
+### Real-ESRGAN
+
+Real-ESRGAN 可选择以下模型：
+
+- 通用照片：`realesrgan-x4plus`
+- 二次元插画：`realesrgan-x4plus-anime`
+- 动画或视频帧：`realesr-animevideov3`
+
+Real-ESRGAN 支持 2×、3×、4×目标倍率。当前 ncnn 版本没有独立的降噪参数，因此选择 Real-ESRGAN 时界面不会显示降噪选项。
+
+### Waifu2x
+
+Waifu2x 支持关闭、轻度、中度和强四档降噪，并支持图片放大。
+
+## 输出格式说明
+
+选择“保留原格式”时，PNG 和 JPG 会保留对应格式；WebP 目前会输出为 PNG。
 
 ## 使用
 
@@ -19,29 +37,25 @@ npm install
 npm run dev
 ```
 
-第一次運行 `npm run dev` 會自動下載處理引擎到 `engines/` 目錄。下載完成後打開：
+首次运行 `npm run dev` 会自动下载推理引擎到 `engines/` 目录。下载完成后访问：
 
 ```text
 http://localhost:3000
 ```
 
-如果只想檢查引擎是否存在：
+检查引擎是否已安装：
 
 ```bash
 npm run engines:check
 ```
 
-如果想重新安裝引擎：
+重新安装引擎：
 
 ```bash
 npm run engines:install
 ```
 
-## 本地目錄
+## 本地目录
 
-- `engines/`：本地超分引擎，不提交到代碼倉庫
-- `storage/jobs/`：上傳圖片和輸出結果，不提交到代碼倉庫
-
-## 說明
-
-Real-ESRGAN 更適合通用圖片、照片和 AI 生圖。Waifu2x 更適合插畫、二次元圖片和輕量降噪。
+- `engines/`：本地推理引擎，不提交到代码仓库。
+- `storage/jobs/`：上传图片和输出结果，不提交到代码仓库。

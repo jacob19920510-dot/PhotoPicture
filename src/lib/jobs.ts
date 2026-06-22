@@ -104,12 +104,6 @@ async function runJob(id: string) {
   try {
     patchJob(job, { status: "running", progress: 12 });
 
-    if (job.settings.engine === "faithful") {
-      await runFaithfulJob(job);
-      patchJob(job, { status: "succeeded", progress: 100 });
-      return;
-    }
-
     const command = getEngineCommand(job.settings, job.inputPath, job.outputPath);
 
     await execute(command.executable, command.args, job.workDir, (progress) => {
@@ -127,46 +121,6 @@ async function runJob(id: string) {
       error: error instanceof Error ? error.message : "Processing failed. Please try again."
     });
   }
-}
-
-async function runFaithfulJob(job: JobRecord) {
-  if (!job.originalWidth || !job.originalHeight) {
-    throw new Error("Could not read image size.");
-  }
-
-  patchJob(job, { progress: 28 });
-
-  const targetWidth = job.originalWidth * job.settings.scale;
-  const targetHeight = job.originalHeight * job.settings.scale;
-  let pipeline = sharp(job.inputPath, { animated: false })
-    .rotate()
-    .resize(targetWidth, targetHeight, {
-      fit: "fill",
-      kernel: sharp.kernel.lanczos3,
-      withoutEnlargement: false
-    });
-
-  if (job.settings.denoise === "high") {
-    pipeline = pipeline.blur(0.3);
-  }
-
-  patchJob(job, { progress: 62 });
-
-  pipeline = pipeline.sharpen({
-    sigma: job.settings.scale >= 3 ? 0.9 : 0.75,
-    m1: 0.6,
-    m2: 1.8
-  });
-
-  if (job.outputPath.endsWith(".jpg")) {
-    pipeline = pipeline.flatten({ background: "#ffffff" }).jpeg({ quality: 94, mozjpeg: true });
-  } else {
-    pipeline = pipeline.png({ compressionLevel: 8, adaptiveFiltering: true });
-  }
-
-  await pipeline.toFile(job.outputPath);
-  await stat(job.outputPath);
-  patchJob(job, { progress: 94 });
 }
 
 function execute(

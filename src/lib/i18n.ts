@@ -22,7 +22,6 @@ export type TranslationKey =
   | "scaleLabel"
   | "denoiseLabel"
   | "outputFormatLabel"
-  | "faithfulEngine"
   | "realesrganEngine"
   | "waifu2xEngine"
   | "denoiseOff"
@@ -76,7 +75,6 @@ export const translations = {
     scaleLabel: "Scale",
     denoiseLabel: "Denoise",
     outputFormatLabel: "Output format",
-    faithfulEngine: "Faithful HD",
     realesrganEngine: "Real-ESRGAN",
     waifu2xEngine: "Waifu2x",
     denoiseOff: "Off",
@@ -85,7 +83,7 @@ export const translations = {
     denoiseHigh: "High",
     outputPreserve: "Preserve original",
     engineMissing: "The selected engine is not installed. Restart the development server to download it automatically, or run npm run engines:install.",
-    aiEngineWarning: "AI engines may redraw details. Use Faithful HD for images with text, tables or posters.",
+    aiEngineWarning: "AI engines may redraw details, especially text, tables and posters.",
     startButton: "Start processing",
     resetTitle: "Choose another image",
     originalPane: "Original",
@@ -120,7 +118,6 @@ export const translations = {
     scaleLabel: "放大倍率",
     denoiseLabel: "降噪",
     outputFormatLabel: "输出格式",
-    faithfulEngine: "保真高清",
     realesrganEngine: "Real-ESRGAN",
     waifu2xEngine: "Waifu2x",
     denoiseOff: "关闭",
@@ -129,7 +126,7 @@ export const translations = {
     denoiseHigh: "强",
     outputPreserve: "保留原格式",
     engineMissing: "当前引擎未安装。重新运行开发服务会自动下载，或运行 npm run engines:install。",
-    aiEngineWarning: "AI 引擎可能重绘细节。带文字、表格、海报时建议用保真高清。",
+    aiEngineWarning: "AI 引擎可能重绘细节，尤其是文字、表格和海报。",
     startButton: "开始处理",
     resetTitle: "重新选择",
     originalPane: "原图",
@@ -164,7 +161,6 @@ export const translations = {
     scaleLabel: "放大倍率",
     denoiseLabel: "降噪",
     outputFormatLabel: "輸出格式",
-    faithfulEngine: "保真高清",
     realesrganEngine: "Real-ESRGAN",
     waifu2xEngine: "Waifu2x",
     denoiseOff: "關閉",
@@ -173,7 +169,7 @@ export const translations = {
     denoiseHigh: "強",
     outputPreserve: "保留原格式",
     engineMissing: "目前引擎未安裝。重新執行開發服務會自動下載，或執行 npm run engines:install。",
-    aiEngineWarning: "AI 引擎可能重繪細節。帶有文字、表格、海報時建議使用保真高清。",
+    aiEngineWarning: "AI 引擎可能重繪細節，尤其是文字、表格和海報。",
     startButton: "開始處理",
     resetTitle: "重新選擇",
     originalPane: "原圖",
@@ -208,7 +204,6 @@ export const translations = {
     scaleLabel: "拡大倍率",
     denoiseLabel: "ノイズ低減",
     outputFormatLabel: "出力形式",
-    faithfulEngine: "忠実高解像度",
     realesrganEngine: "Real-ESRGAN",
     waifu2xEngine: "Waifu2x",
     denoiseOff: "オフ",
@@ -217,7 +212,7 @@ export const translations = {
     denoiseHigh: "高",
     outputPreserve: "元の形式を維持",
     engineMissing: "選択中のエンジンがインストールされていません。開発サーバーを再起動すると自動でダウンロードされます。または npm run engines:install を実行してください。",
-    aiEngineWarning: "AI エンジンは細部を描き直す場合があります。文字、表、ポスターがある画像は忠実高解像度をおすすめします。",
+    aiEngineWarning: "AI エンジンは細部を描き直す場合があります。特に文字、表、ポスターではご注意ください。",
     startButton: "処理を開始",
     resetTitle: "別の画像を選択",
     originalPane: "元画像",
