@@ -68,6 +68,11 @@ export function getEngineCommand(settings: JobSettings, inputPath: string, outpu
   }
 
   if (settings.engine === "realesrgan") {
+    // The x4plus models only produce valid output at their native 4x scale in
+    // this ncnn build. jobs.ts resizes that output to the user's selected scale.
+    const modelScale =
+      settings.realesrganModel === "realesr-animevideov3" ? settings.scale : 4;
+
     return {
       executable: engine.executable,
       args: [
@@ -76,9 +81,9 @@ export function getEngineCommand(settings: JobSettings, inputPath: string, outpu
         "-o",
         outputPath,
         "-n",
-        "realesr-animevideov3",
+        settings.realesrganModel,
         "-s",
-        String(settings.scale),
+        String(modelScale),
         "-t",
         "256",
         "-f",

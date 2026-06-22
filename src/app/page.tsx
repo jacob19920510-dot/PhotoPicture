@@ -21,6 +21,7 @@ import type {
   JobSettings,
   OutputFormat,
   PublicJob,
+  RealEsrganModel,
   ScaleFactor
 } from "@/lib/types";
 
@@ -47,6 +48,12 @@ const denoiseOptions: Array<{ value: DenoiseLevel; label: keyof (typeof translat
   { value: "high", label: "denoiseHigh" }
 ];
 
+const realEsrganModelOptions: Array<{ value: RealEsrganModel; label: string }> = [
+  { value: "realesrgan-x4plus", label: "通用照片 (realesrgan-x4plus)" },
+  { value: "realesrgan-x4plus-anime", label: "二次元插画 (realesrgan-x4plus-anime)" },
+  { value: "realesr-animevideov3", label: "动画/视频帧 (realesr-animevideov3)" }
+];
+
 export default function Home() {
   const [theme, setTheme] = useState<ThemeId>("blue");
   const [language, setLanguage] = useState<LanguageId>("zh-CN");
@@ -56,6 +63,7 @@ export default function Home() {
     engine: "faithful",
     scale: 2,
     denoise: "medium",
+    realesrganModel: "realesrgan-x4plus",
     outputFormat: "preserve"
   });
   const [job, setJob] = useState<PublicJob | null>(null);
@@ -158,6 +166,7 @@ export default function Home() {
     formData.set("engine", settings.engine);
     formData.set("scale", String(settings.scale));
     formData.set("denoise", settings.denoise);
+    formData.set("realesrganModel", settings.realesrganModel);
     formData.set("outputFormat", settings.outputFormat);
 
     try {
@@ -298,23 +307,44 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="field">
-              <label>{text.denoiseLabel}</label>
-              <div className="segmented four">
-                {denoiseOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    className={settings.denoise === option.value ? "active" : undefined}
-                    onClick={() =>
-                      setSettings((current) => ({ ...current, denoise: option.value }))
-                    }
-                  >
-                    {text[option.label]}
-                  </button>
-                ))}
+            {settings.engine === "realesrgan" ? (
+              <div className="field">
+                <label>Real-ESRGAN 模型</label>
+                <select
+                  value={settings.realesrganModel}
+                  onChange={(event) =>
+                    setSettings((current) => ({
+                      ...current,
+                      realesrganModel: event.target.value as RealEsrganModel
+                    }))
+                  }
+                >
+                  {realEsrganModelOptions.map((model) => (
+                    <option key={model.value} value={model.value}>
+                      {model.label}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </div>
+            ) : (
+              <div className="field">
+                <label>{text.denoiseLabel}</label>
+                <div className="segmented four">
+                  {denoiseOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      className={settings.denoise === option.value ? "active" : undefined}
+                      onClick={() =>
+                        setSettings((current) => ({ ...current, denoise: option.value }))
+                      }
+                    >
+                      {text[option.label]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="field">
               <label>{text.outputFormatLabel}</label>

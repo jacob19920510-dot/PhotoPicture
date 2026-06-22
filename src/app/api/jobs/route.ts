@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { createJob } from "@/lib/jobs";
-import type { DenoiseLevel, EngineId, OutputFormat, ScaleFactor } from "@/lib/types";
+import type {
+  DenoiseLevel,
+  EngineId,
+  OutputFormat,
+  RealEsrganModel,
+  ScaleFactor
+} from "@/lib/types";
 
 export const runtime = "nodejs";
 
@@ -17,6 +23,7 @@ export async function POST(request: Request) {
       engine: parseEngine(formData.get("engine")),
       scale: parseScale(formData.get("scale")),
       denoise: parseDenoise(formData.get("denoise")),
+      realesrganModel: parseRealEsrganModel(formData.get("realesrganModel")),
       outputFormat: parseOutputFormat(formData.get("outputFormat"))
     };
 
@@ -43,6 +50,14 @@ function parseScale(value: FormDataEntryValue | null): ScaleFactor {
 function parseDenoise(value: FormDataEntryValue | null): DenoiseLevel {
   if (value === "off" || value === "low" || value === "high") return value;
   return "medium";
+}
+
+function parseRealEsrganModel(value: FormDataEntryValue | null): RealEsrganModel {
+  if (value === "realesrgan-x4plus-anime" || value === "realesr-animevideov3") {
+    return value;
+  }
+
+  return "realesrgan-x4plus";
 }
 
 function parseOutputFormat(value: FormDataEntryValue | null): OutputFormat {
